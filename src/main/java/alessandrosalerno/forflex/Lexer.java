@@ -27,6 +27,7 @@ class Lexer {
             tokens.add(t);
         }
 
+        tokens.add(new Token(TokenType.EOF, "", this.line, this.line, this.column));
         return tokens;
     }
 
@@ -126,6 +127,7 @@ class Lexer {
                 }
 
                 tokenType = candidate;
+                val.append("."); // Dummy char for length eval
                 this.advance();
                 break;
             }

@@ -59,7 +59,7 @@ public class ForflexParser {
         Lexer l = new Lexer(formula);
         List<Token> tokens = l.tokenize();
         ExpressionParser parser = new ExpressionParser(tokens, this.functions, variables, formula, 0);
-        ForflexEvaluable root = parser.parseExpression();
+        ForflexEvaluable root = parser.parseAll();
         return new ForflexExpression(root);
     }
 
@@ -76,6 +76,12 @@ public class ForflexParser {
             this.variables = variables;
             this.formula = formula;
             this.index = index;
+        }
+
+        private ForflexEvaluable parseAll() throws ForflexTypeMismatchError, ForflexUnexpectedTokenError, ForflexUndeclaredIdentifierError {
+            ForflexEvaluable formula = this.parseExpression();
+            this.expect(TokenType.EOF);
+            return formula;
         }
 
         private ForflexEvaluable parseExpression() throws ForflexUnexpectedTokenError, ForflexTypeMismatchError, ForflexUndeclaredIdentifierError {
@@ -158,14 +164,18 @@ public class ForflexParser {
             return null;
         }
 
-        private List<ForflexEvaluable> parseParameterList() throws ForflexUnexpectedTokenError, ForflexTypeMismatchError, ForflexUndeclaredIdentifierError {
+        private List<Object> parseParameterList() throws ForflexUnexpectedTokenError, ForflexTypeMismatchError, ForflexUndeclaredIdentifierError {
             this.expect(TokenType.LPAREN);
-            List<ForflexEvaluable> params = new ArrayList<>();
+            List<Object> params = new ArrayList<>();
             Token next = null;
 
             do {
-                // TODO: handle strings
-                params.add(this.parseExpression());
+                if (TokenType.STRING == this.peekToken(TokenType.STRING)) {
+                    params.add(Objects.requireNonNull(this.nextTokenOfType(TokenType.STRING)).value());
+                } else if (TokenType.RPAREN != this.peekToken(TokenType.RPAREN)) {
+                    params.add(this.parseExpression());
+                }
+
                 next = this.expect(TokenType.COMMA, TokenType.RPAREN);
             } while (TokenType.COMMA == next.type());
 
