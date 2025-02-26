@@ -20,10 +20,10 @@ public class ForflexBinaryNode implements ForflexEvaluable {
     @Override
     public ForflexAlgebra evaluate() {
         return switch (this.operation) {
-            case ForflexAlgebraOperation.ADDITION -> this.left.evaluate().add(this.right.evaluate());
-            case ForflexAlgebraOperation.SUBTRACTION -> this.left.evaluate().subtract(this.right.evaluate());
-            case ForflexAlgebraOperation.MULTIPLICATION -> this.left.evaluate().multiply(this.right.evaluate());
-            case ForflexAlgebraOperation.DIVISION -> this.left.evaluate().divide(this.right.evaluate());
+            case ADDITION -> this.left.evaluate().add(this.right.evaluate());
+            case SUBTRACTION -> this.left.evaluate().subtract(this.right.evaluate());
+            case MULTIPLICATION -> this.left.evaluate().multiply(this.right.evaluate());
+            case DIVISION -> this.left.evaluate().divide(this.right.evaluate());
         };
     }
 }
