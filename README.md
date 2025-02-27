@@ -26,11 +26,12 @@
 </div>
 
 ## Features
-- Java functions callable from inside the expressions
-- Support for strings in function parameters
-- Support for expression parameters (passed from Java program)
-- Support for custom algebric structures (Real numbers are the default)
-- Custom exceptions and error messages
+- Java function invocation inside expressions
+- Strings in function parameters (used to retreive data from the host program)
+- Expression parameters
+- Custom algebric structures other than real numbers
+- Parse tree caching
+- Error handling
 
 ## Syntax and grammar
 The grammar is defined in pseudo-BNF as follows:
@@ -62,6 +63,98 @@ However, the round functions and the other symbols must be defied by the Java pr
 1:1 ERROR: Undeclared identifier "round"
  1 | round((a + b + c - d) / (5.47 * sin(1)) + priceof("AAPL", "2025-02-26"))
    | ~~~~~
+```
+
+## Structure
+Forflex has six main concepts:
+- Algebric structures
+- Evaluables
+- Expressions
+- Functions
+- Parameters
+- Parser
+
+### Algebric structures
+Algebric structures in Forflex define what operations can be applied to a number and how these operations behave. Algebric structures are classes that implement `ForflexAlgebra` and define methods for addition, subtraction, multiplication, and division. If a given algebric structure does not support one or more of these operations, it can throw a `ForflexUnsupportedOperationError`. The default algebric structure is `ForflexRealNumber`.
+
+### Evaluables
+Evaluables in Forflex are essentially nodes in the parse tree. Evaluables implement the `ForflexEvaluable` interface and its method `evaluate` which returns an instance of a `ForflexAlgebra` when called.
+Forflex ships with four main evaluables:
+- Identity (`ForflexIdentity` - returns the same instance of `ForflexAlgebra` that was passed)
+- Binary (`ForflexBinaryNode` - holds two other evaluables on the left and right in order to make the binary tree)
+- Function call (`ForflexFunctionCallNode` - used to represent a function call in the tree)
+- Parameter (`ForflexParameter` - used to store references to parameters)
+
+### Expressions
+Expressions in Forflex are a special type of evaluable which stands outside the tree and is used to cahce the tree itself in order to reuse it. This removes the need to reparse the expression every time it has to be evaluated with a given set of parameters.
+
+### Functions
+Functions in Forflex are implementations of the `ForflexFunction` interface which, once added to a Parser, can be invoked from within an expression.
+
+### Parameters
+Parameters in Forflex are named values that reside in the host Java program but can be access in read-only mode within expressions.
+
+### Parser
+The Parser (`ForflexParser`) is the component responsible for constructing the tree. It first tokenizes the expression using the Lexer and then recursively scrolls the token list to build the tree.
+
+## Example
+```java
+package alessandrosalerno.forflex;
+
+import alessandrosalerno.forflex.errors.preprocessor.ForflexPreprocessorError;
+import alessandrosalerno.forflex.errors.runtime.ForflexParameterCountError;
+import alessandrosalerno.forflex.errors.runtime.ForflexParameterTypeException;
+import alessandrosalerno.forflex.nodes.ForflexAlgebra;
+import alessandrosalerno.forflex.nodes.ForflexRealNumber;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+        try {
+            String formula = "round((a + b + c - d) / (5.47 * sin(1)) + priceof(\"AAPL\", \"2025-02-26\"))";
+            Map<String, ForflexAlgebra> parameters = new HashMap<>();
+
+            parameters.put("a", new ForflexRealNumber(1));
+            parameters.put("b", new ForflexRealNumber(2));
+            parameters.put("c", new ForflexRealNumber(3));
+            parameters.put("d", new ForflexRealNumber(4));
+
+            ForflexParser parser = new ForflexParser().addFunctions(ForflexUtils.DEFAULT_FUNCTIONS)
+                                                        .addFunction("priceof", new ForflexFunction() {
+                @Override
+                public ForflexAlgebra run(Object[] params) {
+                    String symbol = ForflexUtils.requireParameterType(params, 0, String.class);
+                    String date = ForflexUtils.requireParameterType(params, 1, String.class);
+                    // Do some magic stock market stuff
+                    return new ForflexRealNumber(200.5);
+                }
+            });
+
+            ForflexExpression expr = parser.parse(formula);
+            ForflexRealNumber result = (ForflexRealNumber) expr.evaluate(parameters);
+            System.out.println(result.getDouble());
+        } catch (ForflexPreprocessorError e) {
+            e.printErrorMessage();
+        } catch (ForflexParameterCountError
+                 | ForflexParameterTypeException e) {
+            e.printStackTrace();;
+        }
+    }
+}
+```
+
+## Installing Forflex with Maven
+After downloading the JAR and placing it in some project directory (e.g., resources), use the following dependency structure in your pom.xml file:
+```xml
+<dependency>
+    <groupId>alessandrosalerno.forflex</groupId>
+    <artifactId>Forflex</artifactId>
+    <version>1.0.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/src/main/resources/Forflex-1.0.0.jar</systemPath>
+</dependency>
 ```
 
 ## License
