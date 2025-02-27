@@ -124,15 +124,15 @@ public class Main {
             parameters.put("d", new ForflexRealNumber(4));
 
             ForflexParser parser = new ForflexParser().addFunctions(ForflexUtils.DEFAULT_FUNCTIONS)
-                    .addFunction("priceof", new ForflexFunction() {
-                        @Override
-                        public ForflexAlgebra run(Object[] params) {
-                            String symbol = ForflexUtils.requireParameterType(params, 0, String.class);
-                            String date = ForflexUtils.requireParameterType(params, 1, String.class);
-                            // Do some magic stock market stuff
-                            return new ForflexRealNumber(200.5);
-                        }
-                    });
+                                                        .addFunction("priceof", new ForflexFunction() {
+                @Override
+                public ForflexAlgebra run(Object[] params) {
+                    String symbol = ForflexUtils.requireParameterType(params, 0, String.class);
+                    String date = ForflexUtils.requireParameterType(params, 1, String.class);
+                    // Do some magic stock market stuff
+                    return new ForflexRealNumber(200.5);
+                }
+            });
 
             ForflexExpression expr = parser.parse(formula, parameters);
             // Now the expression has been parsed, parameters can be changed at any time
