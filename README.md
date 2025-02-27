@@ -132,8 +132,10 @@ public class Main {
                 }
             });
 
-            ForflexExpression expr = parser.parse(formula);
-            ForflexRealNumber result = (ForflexRealNumber) expr.evaluate(parameters);
+            ForflexExpression expr = parser.parse(formula, parameters);
+            // Now the expression has been parsed, parameters can be changed at any time\
+            // NOTE: this means that parameters are NOT thread-safe!
+            ForflexRealNumber result = (ForflexRealNumber) expr.evaluate();
             System.out.println(result.getDouble());
         } catch (ForflexPreprocessorError e) {
             e.printErrorMessage();
