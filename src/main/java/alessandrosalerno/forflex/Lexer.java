@@ -27,7 +27,7 @@ class Lexer {
             tokens.add(t);
         }
 
-        tokens.add(new Token(TokenType.EOF, "", this.line, this.line, this.column));
+        tokens.add(new Token(TokenType.EOF, " ", this.line, this.line, this.column));
         return tokens;
     }
 

@@ -19,6 +19,6 @@ public class ForflexParserError extends ForflexPreprocessorError {
         String lineStirng = " " + this.getLine() + " | ";
         String line = this.formula.replaceAll("\r", "").split("\n")[this.getLine() - 1];
         System.err.println(lineStirng + line);
-        System.err.println(" ".repeat(lineStirng.length() - 2) + "| " + " ".repeat(this.getCol() - this.token.value().length() + 1) + "~".repeat(this.token.value().length()));
+        System.err.println(" ".repeat(lineStirng.length() - 2) + "| " + " ".repeat(this.getCol() - 1) + "~".repeat(this.token.value().length()));
     }
 }

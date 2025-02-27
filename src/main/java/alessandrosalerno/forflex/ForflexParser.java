@@ -26,21 +26,15 @@ Grammar:
 
 import alessandrosalerno.forflex.errors.preprocessor.lexer.ForflexUnexpectedCharacterError;
 import alessandrosalerno.forflex.errors.preprocessor.lexer.ForflexUnterminatedStringError;
-import alessandrosalerno.forflex.errors.preprocessor.parser.ForflexParserError;
 import alessandrosalerno.forflex.errors.preprocessor.parser.ForflexTypeMismatchError;
 import alessandrosalerno.forflex.errors.preprocessor.parser.ForflexUndeclaredIdentifierError;
 import alessandrosalerno.forflex.errors.preprocessor.parser.ForflexUnexpectedTokenError;
 import alessandrosalerno.forflex.nodes.*;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class ForflexParser {
     private final Map<String, ForflexFunction> functions;
-
-    public ForflexParser(Map<String, ForflexFunction> functions) {
-        this.functions = functions;
-    }
 
     public ForflexParser() {
         this.functions = new HashMap<>();
@@ -52,13 +46,17 @@ public class ForflexParser {
     }
 
     public ForflexParser addFunctions(Map<String, ForflexFunction> functions) {
+        for (String s : functions.keySet()) {
+            this.functions.put(s, functions.get(s));
+        }
+
         return this;
     }
 
-    public ForflexExpression parse(String formula, Map<String, ForflexAlgebra> variables) throws ForflexUnterminatedStringError, ForflexUnexpectedCharacterError, ForflexTypeMismatchError, ForflexUnexpectedTokenError, ForflexUndeclaredIdentifierError {
+    public ForflexExpression parse(String formula, Map<String, ForflexAlgebra> parameters) throws ForflexUnterminatedStringError, ForflexUnexpectedCharacterError, ForflexTypeMismatchError, ForflexUnexpectedTokenError, ForflexUndeclaredIdentifierError {
         Lexer l = new Lexer(formula);
         List<Token> tokens = l.tokenize();
-        ExpressionParser parser = new ExpressionParser(tokens, this.functions, variables, formula, 0);
+        ExpressionParser parser = new ExpressionParser(tokens, this.functions, parameters, formula, 0);
         ForflexEvaluable root = parser.parseAll();
         return new ForflexExpression(root);
     }
@@ -66,14 +64,14 @@ public class ForflexParser {
     private static class ExpressionParser {
         private final List<Token> tokens;
         private final Map<String, ForflexFunction> functions;
-        private final Map<String, ForflexAlgebra> variables;
+        private final Map<String, ForflexAlgebra> parameters;
         private final String formula;
         private int index;
 
         public ExpressionParser(List<Token> tokens, Map<String, ForflexFunction> functions, Map<String, ForflexAlgebra> variables, String formula, int index) {
             this.tokens = tokens;
             this.functions = functions;
-            this.variables = variables;
+            this.parameters = variables;
             this.formula = formula;
             this.index = index;
         }
@@ -130,21 +128,21 @@ public class ForflexParser {
 
                 case MINUS -> {
                     ForflexEvaluable subFactor = this.parseFactor();
-                    return new ForflexBinaryNode(new ForflexIdentity(new ForflexRealNode(-1)), subFactor, ForflexAlgebraOperation.MULTIPLICATION);
+                    return new ForflexBinaryNode(new ForflexIdentity(new ForflexRealNumber(-1)), subFactor, ForflexAlgebraOperation.MULTIPLICATION);
                 }
 
                 case NUMBER -> {
-                    return new ForflexIdentity(new ForflexRealNode(Double.parseDouble(token.value())));
+                    return new ForflexIdentity(new ForflexRealNumber(Double.parseDouble(token.value())));
                 }
 
                 case IDENTIFIER -> {
                     if (!this.functions.containsKey(token.value())
-                            && !this.variables.containsKey(token.value())) {
+                            && !this.parameters.containsKey(token.value())) {
                         throw new ForflexUndeclaredIdentifierError(this.formula, token);
                     }
 
                     if (TokenType.LPAREN == this.peekToken(TokenType.LPAREN)) {
-                        if (this.variables.containsKey(token.value())) {
+                        if (this.parameters.containsKey(token.value())) {
                             throw new ForflexTypeMismatchError(this.formula, token, ForflexFunction.class, ForflexAlgebra.class);
                         }
 
@@ -156,7 +154,7 @@ public class ForflexParser {
                         throw new ForflexTypeMismatchError(this.formula, token, ForflexAlgebra.class, ForflexFunction.class);
                     }
 
-                    return new ForflexIdentity(this.variables.get(token.value()));
+                    return new ForflexIdentity(this.parameters.get(token.value()));
                 }
             }
 
