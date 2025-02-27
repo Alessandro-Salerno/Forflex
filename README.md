@@ -144,7 +144,6 @@ public class Main {
         } catch (ForflexParameterCountError
                  | ForflexParameterTypeError e) {
             e.printStackTrace();
-            ;
         }
     }
 }
