@@ -57,21 +57,21 @@ public class ForflexParser {
     }
 
     public ForflexExpression parse(String formula, Map<String, ForflexAlgebra> parameters) throws ForflexUnterminatedStringError, ForflexUnexpectedCharacterError, ForflexTypeMismatchError, ForflexUnexpectedTokenError, ForflexUndeclaredIdentifierError {
-        Lexer l = new Lexer(formula);
-        List<Token> tokens = l.tokenize();
+        ForflexLexer l = new ForflexLexer(formula);
+        List<ForflexToken> tokens = l.tokenize();
         ExpressionParser parser = new ExpressionParser(tokens, this.functions, parameters, formula, 0);
         ForflexEvaluable root = parser.parseAll();
         return new ForflexExpression(root);
     }
 
     private static class ExpressionParser {
-        private final List<Token> tokens;
+        private final List<ForflexToken> tokens;
         private final Map<String, ForflexFunction> functions;
         private final Map<String, ForflexAlgebra> parameters;
         private final String formula;
         private int index;
 
-        public ExpressionParser(List<Token> tokens, Map<String, ForflexFunction> functions, Map<String, ForflexAlgebra> variables, String formula, int index) {
+        public ExpressionParser(List<ForflexToken> tokens, Map<String, ForflexFunction> functions, Map<String, ForflexAlgebra> variables, String formula, int index) {
             this.tokens = tokens;
             this.functions = functions;
             this.parameters = variables;
@@ -81,15 +81,15 @@ public class ForflexParser {
 
         private ForflexEvaluable parseAll() throws ForflexTypeMismatchError, ForflexUnexpectedTokenError, ForflexUndeclaredIdentifierError {
             ForflexEvaluable formula = this.parseExpression();
-            this.expect(TokenType.EOF);
+            this.expect(ForflexTokenType.EOF);
             return formula;
         }
 
         private ForflexEvaluable parseExpression() throws ForflexUnexpectedTokenError, ForflexTypeMismatchError, ForflexUndeclaredIdentifierError {
             ForflexEvaluable expr = this.parseTerm();
-            Token next = null;
+            ForflexToken next = null;
 
-            while (null != (next = this.nextTokenOfType(TokenType.PLUS, TokenType.MINUS))) {
+            while (null != (next = this.nextTokenOfType(ForflexTokenType.PLUS, ForflexTokenType.MINUS))) {
                 ForflexAlgebraOperation op = switch (next.type()) {
                     case PLUS -> ForflexAlgebraOperation.ADDITION;
                     case MINUS -> ForflexAlgebraOperation.SUBTRACTION;
@@ -104,9 +104,9 @@ public class ForflexParser {
 
         private ForflexEvaluable parseTerm() throws ForflexUnexpectedTokenError, ForflexTypeMismatchError, ForflexUndeclaredIdentifierError {
             ForflexEvaluable term = this.parseFactor();
-            Token next = null;
+            ForflexToken next = null;
 
-            while (null != (next = this.nextTokenOfType(TokenType.STAR, TokenType.SLASH))) {
+            while (null != (next = this.nextTokenOfType(ForflexTokenType.STAR, ForflexTokenType.SLASH))) {
                 ForflexAlgebraOperation op = switch (next.type()) {
                     case STAR -> ForflexAlgebraOperation.MULTIPLICATION;
                     case SLASH -> ForflexAlgebraOperation.DIVISION;
@@ -120,12 +120,12 @@ public class ForflexParser {
         }
 
         private ForflexEvaluable parseFactor() throws ForflexUnexpectedTokenError, ForflexUndeclaredIdentifierError, ForflexTypeMismatchError {
-            Token token = this.expect(TokenType.LPAREN, TokenType.MINUS, TokenType.NUMBER, TokenType.IDENTIFIER);
+            ForflexToken token = this.expect(ForflexTokenType.LPAREN, ForflexTokenType.MINUS, ForflexTokenType.NUMBER, ForflexTokenType.IDENTIFIER);
 
             switch (token.type()) {
                 case LPAREN -> {
                     ForflexEvaluable ret = this.parseExpression();
-                    this.expect(TokenType.RPAREN);
+                    this.expect(ForflexTokenType.RPAREN);
                     return ret;
                 }
 
@@ -144,7 +144,7 @@ public class ForflexParser {
                         throw new ForflexUndeclaredIdentifierError(this.formula, token);
                     }
 
-                    if (TokenType.LPAREN == this.peekToken(TokenType.LPAREN)) {
+                    if (ForflexTokenType.LPAREN == this.peekToken(ForflexTokenType.LPAREN)) {
                         if (this.parameters.containsKey(token.value())) {
                             throw new ForflexTypeMismatchError(this.formula, token, ForflexFunction.class, ForflexAlgebra.class);
                         }
@@ -165,33 +165,33 @@ public class ForflexParser {
         }
 
         private List<Object> parseParameterList() throws ForflexUnexpectedTokenError, ForflexTypeMismatchError, ForflexUndeclaredIdentifierError {
-            this.expect(TokenType.LPAREN);
+            this.expect(ForflexTokenType.LPAREN);
             List<Object> params = new ArrayList<>();
-            Token next = null;
+            ForflexToken next = null;
 
             do {
-                if (TokenType.STRING == this.peekToken(TokenType.STRING)) {
-                    params.add(Objects.requireNonNull(this.nextTokenOfType(TokenType.STRING)).value());
-                } else if (TokenType.RPAREN != this.peekToken(TokenType.RPAREN)) {
+                if (ForflexTokenType.STRING == this.peekToken(ForflexTokenType.STRING)) {
+                    params.add(Objects.requireNonNull(this.nextTokenOfType(ForflexTokenType.STRING)).value());
+                } else if (ForflexTokenType.RPAREN != this.peekToken(ForflexTokenType.RPAREN)) {
                     params.add(this.parseExpression());
                 }
 
-                next = this.expect(TokenType.COMMA, TokenType.RPAREN);
-            } while (TokenType.COMMA == next.type());
+                next = this.expect(ForflexTokenType.COMMA, ForflexTokenType.RPAREN);
+            } while (ForflexTokenType.COMMA == next.type());
 
             return params;
         }
 
-        private TokenType peekToken(TokenType... types) {
+        private ForflexTokenType peekToken(ForflexTokenType... types) {
             return this.tokens.get(this.index).type();
         }
 
-        private Token nextTokenOfType(TokenType... types) {
+        private ForflexToken nextTokenOfType(ForflexTokenType... types) {
             if (this.index >= this.tokens.size()) {
                 return null;
             }
 
-            Token next = this.tokens.get(this.index);
+            ForflexToken next = this.tokens.get(this.index);
 
             if (Arrays.asList(types).contains(next.type())) {
                 this.index++;
@@ -201,8 +201,8 @@ public class ForflexParser {
             return null;
         }
 
-        private Token expect(TokenType... types) throws ForflexUnexpectedTokenError {
-            Token ret = this.nextTokenOfType(types);
+        private ForflexToken expect(ForflexTokenType... types) throws ForflexUnexpectedTokenError {
+            ForflexToken ret = this.nextTokenOfType(types);
 
             if (null == ret) {
                 throw new ForflexUnexpectedTokenError(this.formula, this.tokens.get(this.index));

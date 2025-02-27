@@ -1,13 +1,13 @@
 package alessandrosalerno.forflex.errors.preprocessor.parser;
 
-import alessandrosalerno.forflex.Token;
+import alessandrosalerno.forflex.ForflexToken;
 import alessandrosalerno.forflex.errors.preprocessor.ForflexPreprocessorError;
 
 public class ForflexParserError extends ForflexPreprocessorError {
     private final String formula;
-    private Token token;
+    private final ForflexToken token;
 
-    public ForflexParserError(String message, String formula, Token token) {
+    public ForflexParserError(String message, String formula, ForflexToken token) {
         super(token.index(), token.line(), token.col(), message);
         this.formula = formula;
         this.token = token;

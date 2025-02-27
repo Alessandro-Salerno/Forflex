@@ -6,33 +6,33 @@ import alessandrosalerno.forflex.errors.preprocessor.lexer.ForflexUnterminatedSt
 import java.util.ArrayList;
 import java.util.List;
 
-class Lexer {
+public class ForflexLexer {
     private final String formula;
     private int next;
     private int line;
     private int column;
 
-    public Lexer(String formula) {
+    public ForflexLexer(String formula) {
         this.formula = formula;
         this.next = 0;
         this.line = 1;
         this.column = 1;
     }
 
-    public List<Token> tokenize() throws ForflexUnterminatedStringError, ForflexUnexpectedCharacterError {
-        List<Token> tokens = new ArrayList<>();
-        Token t = null;
+    public List<ForflexToken> tokenize() throws ForflexUnterminatedStringError, ForflexUnexpectedCharacterError {
+        List<ForflexToken> tokens = new ArrayList<>();
+        ForflexToken t = null;
 
-        while (TokenType.EOF != (t = this.tokenizeNext()).type()) {
+        while (ForflexTokenType.EOF != (t = this.tokenizeNext()).type()) {
             tokens.add(t);
         }
 
-        tokens.add(new Token(TokenType.EOF, " ", this.line, this.line, this.column));
+        tokens.add(new ForflexToken(ForflexTokenType.EOF, " ", this.line, this.line, this.column));
         return tokens;
     }
 
-    private Token tokenizeNext() throws ForflexUnterminatedStringError, ForflexUnexpectedCharacterError {
-        TokenType tokenType = TokenType.EOF;
+    private ForflexToken tokenizeNext() throws ForflexUnterminatedStringError, ForflexUnexpectedCharacterError {
+        ForflexTokenType tokenType = ForflexTokenType.EOF;
         StringBuilder val = new StringBuilder();
         boolean isString = false;
         char last = 0;
@@ -83,7 +83,7 @@ class Lexer {
                     }
 
                     isString = true;
-                    tokenType = TokenType.STRING;
+                    tokenType = ForflexTokenType.STRING;
 
                     // Avoid adding the quotes to the string
                     continue;
@@ -109,14 +109,14 @@ class Lexer {
                 // Unreachable
             }
 
-            TokenType candidate = switch (c) {
-                case '+' -> TokenType.PLUS;
-                case '-' -> TokenType.MINUS;
-                case '*' -> TokenType.STAR;
-                case '/' -> TokenType.SLASH;
-                case '(' -> TokenType.LPAREN;
-                case ')' -> TokenType.RPAREN;
-                case ',' -> TokenType.COMMA;
+            ForflexTokenType candidate = switch (c) {
+                case '+' -> ForflexTokenType.PLUS;
+                case '-' -> ForflexTokenType.MINUS;
+                case '*' -> ForflexTokenType.STAR;
+                case '/' -> ForflexTokenType.SLASH;
+                case '(' -> ForflexTokenType.LPAREN;
+                case ')' -> ForflexTokenType.RPAREN;
+                case ',' -> ForflexTokenType.COMMA;
 
                 default -> null;
             };
@@ -134,15 +134,15 @@ class Lexer {
 
             if (val.isEmpty()) {
                 if (Character.isDigit(c)) {
-                    tokenType = TokenType.NUMBER;
+                    tokenType = ForflexTokenType.NUMBER;
                 } else if ('_' == c || Character.isAlphabetic(c)) {
-                    tokenType = TokenType.IDENTIFIER;
+                    tokenType = ForflexTokenType.IDENTIFIER;
                 } else {
                     throw new ForflexUnexpectedCharacterError(this.next, this.line, this.column, c, this.formula);
                 }
             }
 
-            if (TokenType.NUMBER == tokenType) {
+            if (ForflexTokenType.NUMBER == tokenType) {
                 if ('.' == c && val.toString().contains(".")) {
                     throw new ForflexUnexpectedCharacterError(this.next, this.line, this.column, c, this.formula);
                 }
@@ -154,7 +154,7 @@ class Lexer {
                 val.append(c);
             }
 
-            if (TokenType.IDENTIFIER == tokenType) {
+            if (ForflexTokenType.IDENTIFIER == tokenType) {
                 if ('_' != c && !Character.isAlphabetic(c) && !Character.isDigit(c)) {
                     throw new ForflexUnexpectedCharacterError(this.next, this.line, this.column, c, this.formula);
                 }
@@ -167,7 +167,7 @@ class Lexer {
             throw new ForflexUnterminatedStringError(this.next, this.line, this.column, this.formula);
         }
 
-        return new Token(tokenType, val.toString(), beginIndex, beginLine, beginCol);
+        return new ForflexToken(tokenType, val.toString(), beginIndex, beginLine, beginCol);
     }
 
     private void advance() {
