@@ -1,6 +1,6 @@
 package alessandrosalerno.forflex;
 
-public enum TokenType {
+enum TokenType {
     PLUS,
     MINUS,
     STAR,

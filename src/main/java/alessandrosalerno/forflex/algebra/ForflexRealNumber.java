@@ -1,4 +1,4 @@
-package alessandrosalerno.forflex.nodes;
+package alessandrosalerno.forflex.algebra;
 
 import alessandrosalerno.forflex.errors.runtime.ForflexUnsupportedOperationError;
 

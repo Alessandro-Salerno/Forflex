@@ -1,11 +1,9 @@
 package alessandrosalerno.forflex.nodes;
 
 import alessandrosalerno.forflex.ForflexFunction;
-import alessandrosalerno.forflex.errors.preprocessor.parser.ForflexTypeMismatchError;
+import alessandrosalerno.forflex.algebra.ForflexAlgebra;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.function.ObjDoubleConsumer;
 
 public class ForflexFunctionCallNode implements ForflexEvaluable {
     private final ForflexFunction function;

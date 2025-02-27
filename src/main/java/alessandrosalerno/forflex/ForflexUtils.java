@@ -1,9 +1,9 @@
 package alessandrosalerno.forflex;
 
 import alessandrosalerno.forflex.errors.runtime.ForflexParameterCountError;
-import alessandrosalerno.forflex.errors.runtime.ForflexParameterTypeException;
-import alessandrosalerno.forflex.nodes.ForflexAlgebra;
-import alessandrosalerno.forflex.nodes.ForflexRealNumber;
+import alessandrosalerno.forflex.errors.runtime.ForflexParameterTypeError;
+import alessandrosalerno.forflex.algebra.ForflexAlgebra;
+import alessandrosalerno.forflex.algebra.ForflexRealNumber;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -121,6 +121,6 @@ public class ForflexUtils {
             return clazz.cast(params[index]);
         }
 
-        throw new ForflexParameterTypeException(clazz, params[index].getClass(), index);
+        throw new ForflexParameterTypeError(clazz, params[index].getClass(), index);
     }
 }

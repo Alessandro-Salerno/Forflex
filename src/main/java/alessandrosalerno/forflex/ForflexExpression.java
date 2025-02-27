@@ -1,6 +1,6 @@
 package alessandrosalerno.forflex;
 
-import alessandrosalerno.forflex.nodes.ForflexAlgebra;
+import alessandrosalerno.forflex.algebra.ForflexAlgebra;
 import alessandrosalerno.forflex.nodes.ForflexBinaryNode;
 import alessandrosalerno.forflex.nodes.ForflexEvaluable;
 

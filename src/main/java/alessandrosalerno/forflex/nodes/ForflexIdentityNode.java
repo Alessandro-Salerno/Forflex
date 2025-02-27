@@ -1,9 +1,11 @@
 package alessandrosalerno.forflex.nodes;
 
-public class ForflexIdentity implements ForflexEvaluable {
+import alessandrosalerno.forflex.algebra.ForflexAlgebra;
+
+public class ForflexIdentityNode implements ForflexEvaluable {
     private final ForflexAlgebra algebra;
 
-    public ForflexIdentity(ForflexAlgebra algebra) {
+    public ForflexIdentityNode(ForflexAlgebra algebra) {
         this.algebra = algebra;
     }
 

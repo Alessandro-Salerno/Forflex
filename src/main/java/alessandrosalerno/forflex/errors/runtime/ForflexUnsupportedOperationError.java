@@ -1,7 +1,7 @@
 package alessandrosalerno.forflex.errors.runtime;
 
-import alessandrosalerno.forflex.nodes.ForflexAlgebra;
-import alessandrosalerno.forflex.nodes.ForflexAlgebraOperation;
+import alessandrosalerno.forflex.algebra.ForflexAlgebra;
+import alessandrosalerno.forflex.algebra.ForflexAlgebraOperation;
 
 public class ForflexUnsupportedOperationError extends RuntimeException {
     public ForflexUnsupportedOperationError(ForflexAlgebra a, ForflexAlgebraOperation operation, ForflexAlgebra b) {

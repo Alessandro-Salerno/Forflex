@@ -1,5 +1,8 @@
 package alessandrosalerno.forflex.nodes;
 
+import alessandrosalerno.forflex.algebra.ForflexAlgebra;
+import alessandrosalerno.forflex.algebra.ForflexAlgebraOperation;
+
 public class ForflexBinaryNode implements ForflexEvaluable {
     private ForflexEvaluable left;
     private ForflexEvaluable right;

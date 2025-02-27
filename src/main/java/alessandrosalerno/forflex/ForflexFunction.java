@@ -1,9 +1,6 @@
 package alessandrosalerno.forflex;
 
-import alessandrosalerno.forflex.errors.preprocessor.parser.ForflexTypeMismatchError;
-import alessandrosalerno.forflex.nodes.ForflexAlgebra;
-
-import java.util.Map;
+import alessandrosalerno.forflex.algebra.ForflexAlgebra;
 
 public interface ForflexFunction {
     ForflexAlgebra run(Object[] params);

@@ -24,6 +24,9 @@ Grammar:
     <factor>     := -<factor>|(<expr>)|<number>|<identifier>|<call>
  */
 
+import alessandrosalerno.forflex.algebra.ForflexAlgebra;
+import alessandrosalerno.forflex.algebra.ForflexAlgebraOperation;
+import alessandrosalerno.forflex.algebra.ForflexRealNumber;
 import alessandrosalerno.forflex.errors.preprocessor.lexer.ForflexUnexpectedCharacterError;
 import alessandrosalerno.forflex.errors.preprocessor.lexer.ForflexUnterminatedStringError;
 import alessandrosalerno.forflex.errors.preprocessor.parser.ForflexTypeMismatchError;
@@ -128,11 +131,11 @@ public class ForflexParser {
 
                 case MINUS -> {
                     ForflexEvaluable subFactor = this.parseFactor();
-                    return new ForflexBinaryNode(new ForflexIdentity(new ForflexRealNumber(-1)), subFactor, ForflexAlgebraOperation.MULTIPLICATION);
+                    return new ForflexBinaryNode(new ForflexIdentityNode(new ForflexRealNumber(-1)), subFactor, ForflexAlgebraOperation.MULTIPLICATION);
                 }
 
                 case NUMBER -> {
-                    return new ForflexIdentity(new ForflexRealNumber(Double.parseDouble(token.value())));
+                    return new ForflexIdentityNode(new ForflexRealNumber(Double.parseDouble(token.value())));
                 }
 
                 case IDENTIFIER -> {
@@ -154,7 +157,7 @@ public class ForflexParser {
                         throw new ForflexTypeMismatchError(this.formula, token, ForflexAlgebra.class, ForflexFunction.class);
                     }
 
-                    return new ForflexParameter(this.parameters, token.value());
+                    return new ForflexParameterNode(this.parameters, token.value());
                 }
             }
 

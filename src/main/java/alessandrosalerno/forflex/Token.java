@@ -1,6 +1,6 @@
 package alessandrosalerno.forflex;
 
-public record Token(TokenType type,
+record Token(TokenType type,
                     String value,
                     int index,
                     int line,

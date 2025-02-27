@@ -81,10 +81,10 @@ Algebric structures in Forflex define what operations can be applied to a number
 ### Evaluables
 Evaluables in Forflex are essentially nodes in the parse tree. Evaluables implement the `ForflexEvaluable` interface and its method `evaluate` which returns an instance of a `ForflexAlgebra` when called.
 Forflex ships with four main evaluables:
-- Identity (`ForflexIdentity` - returns the same instance of `ForflexAlgebra` that was passed)
+- Identity (`ForflexIdentityNode` - returns the same instance of `ForflexAlgebra` that was passed)
 - Binary (`ForflexBinaryNode` - holds two other evaluables on the left and right in order to make the binary tree)
 - Function call (`ForflexFunctionCallNode` - used to represent a function call in the tree)
-- Parameter (`ForflexParameter` - used to store references to parameters)
+- Parameter (`ForflexParameterNode` - used to store references to parameters)
 
 ### Expressions
 Expressions in Forflex are a special type of evaluable which stands outside the tree and is used to cahce the tree itself in order to reuse it. This removes the need to reparse the expression every time it has to be evaluated with a given set of parameters.
@@ -99,14 +99,15 @@ Parameters in Forflex are named values that reside in the host Java program but 
 The Parser (`ForflexParser`) is the component responsible for constructing the tree. It first tokenizes the expression using the Lexer and then recursively scrolls the token list to build the tree.
 
 ## Example
+
 ```java
 package alessandrosalerno.forflex;
 
 import alessandrosalerno.forflex.errors.preprocessor.ForflexPreprocessorError;
 import alessandrosalerno.forflex.errors.runtime.ForflexParameterCountError;
-import alessandrosalerno.forflex.errors.runtime.ForflexParameterTypeException;
-import alessandrosalerno.forflex.nodes.ForflexAlgebra;
-import alessandrosalerno.forflex.nodes.ForflexRealNumber;
+import alessandrosalerno.forflex.errors.runtime.ForflexParameterTypeError;
+import alessandrosalerno.forflex.algebra.ForflexAlgebra;
+import alessandrosalerno.forflex.algebra.ForflexRealNumber;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -123,15 +124,15 @@ public class Main {
             parameters.put("d", new ForflexRealNumber(4));
 
             ForflexParser parser = new ForflexParser().addFunctions(ForflexUtils.DEFAULT_FUNCTIONS)
-                                                        .addFunction("priceof", new ForflexFunction() {
-                @Override
-                public ForflexAlgebra run(Object[] params) {
-                    String symbol = ForflexUtils.requireParameterType(params, 0, String.class);
-                    String date = ForflexUtils.requireParameterType(params, 1, String.class);
-                    // Do some magic stock market stuff
-                    return new ForflexRealNumber(200.5);
-                }
-            });
+                    .addFunction("priceof", new ForflexFunction() {
+                        @Override
+                        public ForflexAlgebra run(Object[] params) {
+                            String symbol = ForflexUtils.requireParameterType(params, 0, String.class);
+                            String date = ForflexUtils.requireParameterType(params, 1, String.class);
+                            // Do some magic stock market stuff
+                            return new ForflexRealNumber(200.5);
+                        }
+                    });
 
             ForflexExpression expr = parser.parse(formula, parameters);
             // Now the expression has been parsed, parameters can be changed at any time
@@ -141,8 +142,9 @@ public class Main {
         } catch (ForflexPreprocessorError e) {
             e.printErrorMessage();
         } catch (ForflexParameterCountError
-                 | ForflexParameterTypeException e) {
-            e.printStackTrace();;
+                 | ForflexParameterTypeError e) {
+            e.printStackTrace();
+            ;
         }
     }
 }
