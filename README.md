@@ -161,7 +161,7 @@ After downloading the JAR and placing it in some project directory (e.g., resour
 </dependency>
 ```
 Alternatively, you can install the package from GitHub Packages:
-```
+```xml
 <dependency>
     <groupId>alessandrosalerno.forflex</groupId>
     <artifactId>forflex</artifactId>
