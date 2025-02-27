@@ -31,7 +31,7 @@
 - Expression parameters
 - Custom algebric structures other than real numbers
 - Parse tree caching
-- Error handling`
+- Error handling
 - Can be used in both FOSS and proprietary software
 
 ## Syntax and grammar
