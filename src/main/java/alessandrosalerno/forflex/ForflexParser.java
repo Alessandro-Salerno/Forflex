@@ -154,11 +154,10 @@ public class ForflexParser {
                         throw new ForflexTypeMismatchError(this.formula, token, ForflexAlgebra.class, ForflexFunction.class);
                     }
 
-                    return new ForflexIdentity(this.parameters.get(token.value()));
+                    return new ForflexParameter(this.parameters, token.value());
                 }
             }
 
-            // TODO: is this right?
             return null;
         }
 
