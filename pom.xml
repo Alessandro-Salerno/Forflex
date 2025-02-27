@@ -6,12 +6,20 @@
 
     <groupId>alessandrosalerno.forflex</groupId>
     <artifactId>forflex</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Alessandro-Salerno Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/Alessandro-Salerno/Forflex</url>
+        </repository>
+    </distributionManagement>
 
 </project>
