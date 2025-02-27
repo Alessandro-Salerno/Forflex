@@ -154,10 +154,18 @@ After downloading the JAR and placing it in some project directory (e.g., resour
 ```xml
 <dependency>
     <groupId>alessandrosalerno.forflex</groupId>
-    <artifactId>Forflex</artifactId>
+    <artifactId>forflex</artifactId>
     <version>1.0.0</version>
     <scope>system</scope>
     <systemPath>${project.basedir}/src/main/resources/Forflex-1.0.0.jar</systemPath>
+</dependency>
+```
+Alternatively, you can install the package from GitHub Packages:
+```
+<dependency>
+    <groupId>alessandrosalerno.forflex</groupId>
+    <artifactId>forflex</artifactId>
+    <version>1.0.0</version>
 </dependency>
 ```
 
