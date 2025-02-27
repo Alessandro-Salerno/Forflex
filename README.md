@@ -31,7 +31,8 @@
 - Expression parameters
 - Custom algebric structures other than real numbers
 - Parse tree caching
-- Error handling
+- Error handling`
+- Can be used in both FOSS and proprietary software
 
 ## Syntax and grammar
 The grammar is defined in pseudo-BNF as follows:
@@ -161,3 +162,6 @@ After downloading the JAR and placing it in some project directory (e.g., resour
 
 ## License
 Forflex is distributed under the Apache License 2.0.
+
+## Credits
+- https://github.com/javalc6/Simple-Expression-Parser
