@@ -101,8 +101,7 @@ The Parser (`ForflexParser`) is the component responsible for constructing the t
 ## Example
 
 ```java
-package alessandrosalerno.forflex;
-
+import alessandrosalerno.forflex.algebra.ForflexString;
 import alessandrosalerno.forflex.errors.preprocessor.ForflexPreprocessorError;
 import alessandrosalerno.forflex.errors.runtime.ForflexParameterCountError;
 import alessandrosalerno.forflex.errors.runtime.ForflexParameterTypeError;
@@ -116,7 +115,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             String formula = "round((a + b + c - d) / (5.47 * sin(1)) + priceof(\"AAPL\", \"2025-02-26\"))";
-            Map<String, ForflexAlgebra> parameters = new HashMap<>();
+            Map<String, ForflexAlgebra<?>> parameters = new HashMap<>();
 
             parameters.put("a", new ForflexRealNumber(1));
             parameters.put("b", new ForflexRealNumber(2));
@@ -124,11 +123,11 @@ public class Main {
             parameters.put("d", new ForflexRealNumber(4));
 
             ForflexParser parser = new ForflexParser().addFunctions(ForflexUtils.DEFAULT_FUNCTIONS)
-                                                        .addFunction("priceof", new ForflexFunction() {
+                                                        .addFunction("priceof", new ForflexFunction<ForflexRealNumber>() {
                 @Override
-                public ForflexAlgebra run(Object[] params) {
-                    String symbol = ForflexUtils.requireParameterType(params, 0, String.class);
-                    String date = ForflexUtils.requireParameterType(params, 1, String.class);
+                public ForflexRealNumber run(ForflexAlgebra<?>[] params) {
+                    String symbol = ForflexUtils.requireParameterPrimitiveType(params, 0, String.class);
+                    String date = ForflexUtils.requireParameterPrimitiveType(params, 1, String.class);
                     // Do some magic stock market stuff
                     return new ForflexRealNumber(200.5);
                 }
@@ -138,7 +137,7 @@ public class Main {
             // Now the expression has been parsed, parameters can be changed at any time
             // NOTE: this means that parameters are NOT thread-safe!
             ForflexRealNumber result = (ForflexRealNumber) expr.evaluate();
-            System.out.println(result.getDouble());
+            System.out.println(result.getPrimitive());
         } catch (ForflexPreprocessorError e) {
             e.printErrorMessage();
         } catch (ForflexParameterCountError

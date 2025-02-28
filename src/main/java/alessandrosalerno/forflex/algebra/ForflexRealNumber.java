@@ -2,23 +2,20 @@ package alessandrosalerno.forflex.algebra;
 
 import alessandrosalerno.forflex.errors.runtime.ForflexUnsupportedOperationError;
 
-public class ForflexRealNumber implements ForflexAlgebra {
-    private double doubleValue;
+public class ForflexRealNumber implements ForflexAlgebra<Double> {
+    private final double doubleValue;
 
     public ForflexRealNumber(double number) {
         this.doubleValue = number;
     }
 
-    public double getDouble() {
+    @Override
+    public Double getPrimitive() {
         return this.doubleValue;
     }
 
-    public void setDouble(double number) {
-        this.doubleValue = number;
-    }
-
     @Override
-    public ForflexAlgebra add(ForflexAlgebra value) {
+    public ForflexRealNumber add(ForflexAlgebra<?> value) {
         if (value instanceof ForflexRealNumber r) {
             return new ForflexRealNumber(this.doubleValue + r.doubleValue);
         }
@@ -27,7 +24,7 @@ public class ForflexRealNumber implements ForflexAlgebra {
     }
 
     @Override
-    public ForflexAlgebra subtract(ForflexAlgebra value) {
+    public ForflexRealNumber subtract(ForflexAlgebra<?> value) {
         if (value instanceof ForflexRealNumber r) {
             return new ForflexRealNumber(this.doubleValue - r.doubleValue);
         }
@@ -36,7 +33,7 @@ public class ForflexRealNumber implements ForflexAlgebra {
     }
 
     @Override
-    public ForflexAlgebra multiply(ForflexAlgebra value) {
+    public ForflexRealNumber multiply(ForflexAlgebra<?> value) {
         if (value instanceof ForflexRealNumber r) {
             return new ForflexRealNumber(this.doubleValue * r.doubleValue);
         }
@@ -45,7 +42,7 @@ public class ForflexRealNumber implements ForflexAlgebra {
     }
 
     @Override
-    public ForflexAlgebra divide(ForflexAlgebra value) {
+    public ForflexRealNumber divide(ForflexAlgebra<?> value) {
         if (value instanceof ForflexRealNumber r) {
             return new ForflexRealNumber(this.doubleValue / r.doubleValue);
         }

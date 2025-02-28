@@ -1,8 +1,9 @@
 package alessandrosalerno.forflex.algebra;
 
-public interface ForflexAlgebra {
-    ForflexAlgebra add(ForflexAlgebra value);
-    ForflexAlgebra subtract(ForflexAlgebra value);
-    ForflexAlgebra multiply(ForflexAlgebra value);
-    ForflexAlgebra divide(ForflexAlgebra value);
+public interface ForflexAlgebra<PrimitiveType> {
+    ForflexAlgebra<PrimitiveType> add(ForflexAlgebra<?> value);
+    ForflexAlgebra<PrimitiveType> subtract(ForflexAlgebra<?> value);
+    ForflexAlgebra<PrimitiveType> multiply(ForflexAlgebra<?> value);
+    ForflexAlgebra<PrimitiveType> divide(ForflexAlgebra<?> value);
+    PrimitiveType getPrimitive();
 }

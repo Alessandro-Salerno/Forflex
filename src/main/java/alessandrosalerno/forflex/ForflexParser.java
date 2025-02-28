@@ -27,6 +27,7 @@ Grammar:
 import alessandrosalerno.forflex.algebra.ForflexAlgebra;
 import alessandrosalerno.forflex.algebra.ForflexAlgebraOperation;
 import alessandrosalerno.forflex.algebra.ForflexRealNumber;
+import alessandrosalerno.forflex.algebra.ForflexString;
 import alessandrosalerno.forflex.errors.preprocessor.lexer.ForflexUnexpectedCharacterError;
 import alessandrosalerno.forflex.errors.preprocessor.lexer.ForflexUnterminatedStringError;
 import alessandrosalerno.forflex.errors.preprocessor.parser.ForflexTypeMismatchError;
@@ -37,18 +38,18 @@ import alessandrosalerno.forflex.nodes.*;
 import java.util.*;
 
 public class ForflexParser {
-    private final Map<String, ForflexFunction> functions;
+    private final Map<String, ForflexFunction<?>> functions;
 
     public ForflexParser() {
         this.functions = new HashMap<>();
     }
 
-    public ForflexParser addFunction(String name, ForflexFunction function) {
+    public ForflexParser addFunction(String name, ForflexFunction<?> function) {
         this.functions.put(name, function);
         return this;
     }
 
-    public ForflexParser addFunctions(Map<String, ForflexFunction> functions) {
+    public ForflexParser addFunctions(Map<String, ForflexFunction<?>> functions) {
         for (String s : functions.keySet()) {
             this.functions.put(s, functions.get(s));
         }
@@ -56,7 +57,7 @@ public class ForflexParser {
         return this;
     }
 
-    public ForflexExpression parse(String formula, Map<String, ForflexAlgebra> parameters) throws ForflexUnterminatedStringError, ForflexUnexpectedCharacterError, ForflexTypeMismatchError, ForflexUnexpectedTokenError, ForflexUndeclaredIdentifierError {
+    public ForflexExpression parse(String formula, Map<String, ForflexAlgebra<?>> parameters) throws ForflexUnterminatedStringError, ForflexUnexpectedCharacterError, ForflexTypeMismatchError, ForflexUnexpectedTokenError, ForflexUndeclaredIdentifierError {
         ForflexLexer l = new ForflexLexer(formula);
         List<ForflexToken> tokens = l.tokenize();
         ExpressionParser parser = new ExpressionParser(tokens, this.functions, parameters, formula, 0);
@@ -66,15 +67,15 @@ public class ForflexParser {
 
     private static class ExpressionParser {
         private final List<ForflexToken> tokens;
-        private final Map<String, ForflexFunction> functions;
-        private final Map<String, ForflexAlgebra> parameters;
+        private final Map<String, ForflexFunction<?>> functions;
+        private final Map<String, ForflexAlgebra<?>> parameters;
         private final String formula;
         private int index;
 
-        public ExpressionParser(List<ForflexToken> tokens, Map<String, ForflexFunction> functions, Map<String, ForflexAlgebra> variables, String formula, int index) {
+        public ExpressionParser(List<ForflexToken> tokens, Map<String, ForflexFunction<?>> functions, Map<String, ForflexAlgebra<?>> parameters, String formula, int index) {
             this.tokens = tokens;
             this.functions = functions;
-            this.parameters = variables;
+            this.parameters = parameters;
             this.formula = formula;
             this.index = index;
         }
@@ -87,8 +88,8 @@ public class ForflexParser {
 
         private ForflexEvaluable parseExpression() throws ForflexUnexpectedTokenError, ForflexTypeMismatchError, ForflexUndeclaredIdentifierError {
             ForflexEvaluable expr = this.parseTerm();
-            ForflexToken next = null;
 
+            ForflexToken next;
             while (null != (next = this.nextTokenOfType(ForflexTokenType.PLUS, ForflexTokenType.MINUS))) {
                 ForflexAlgebraOperation op = switch (next.type()) {
                     case PLUS -> ForflexAlgebraOperation.ADDITION;
@@ -104,8 +105,8 @@ public class ForflexParser {
 
         private ForflexEvaluable parseTerm() throws ForflexUnexpectedTokenError, ForflexTypeMismatchError, ForflexUndeclaredIdentifierError {
             ForflexEvaluable term = this.parseFactor();
-            ForflexToken next = null;
 
+            ForflexToken next;
             while (null != (next = this.nextTokenOfType(ForflexTokenType.STAR, ForflexTokenType.SLASH))) {
                 ForflexAlgebraOperation op = switch (next.type()) {
                     case STAR -> ForflexAlgebraOperation.MULTIPLICATION;
@@ -120,7 +121,7 @@ public class ForflexParser {
         }
 
         private ForflexEvaluable parseFactor() throws ForflexUnexpectedTokenError, ForflexUndeclaredIdentifierError, ForflexTypeMismatchError {
-            ForflexToken token = this.expect(ForflexTokenType.LPAREN, ForflexTokenType.MINUS, ForflexTokenType.NUMBER, ForflexTokenType.IDENTIFIER);
+            ForflexToken token = this.expect(ForflexTokenType.LPAREN, ForflexTokenType.MINUS, ForflexTokenType.NUMBER, ForflexTokenType.IDENTIFIER, ForflexTokenType.STRING);
 
             switch (token.type()) {
                 case LPAREN -> {
@@ -138,18 +139,22 @@ public class ForflexParser {
                     return new ForflexIdentityNode(new ForflexRealNumber(Double.parseDouble(token.value())));
                 }
 
+                case STRING -> {
+                    return new ForflexIdentityNode(new ForflexString(token.value()));
+                }
+
                 case IDENTIFIER -> {
                     if (!this.functions.containsKey(token.value())
                             && !this.parameters.containsKey(token.value())) {
                         throw new ForflexUndeclaredIdentifierError(this.formula, token);
                     }
 
-                    if (ForflexTokenType.LPAREN == this.peekToken(ForflexTokenType.LPAREN)) {
+                    if (ForflexTokenType.LPAREN == this.peekTokenType()) {
                         if (this.parameters.containsKey(token.value())) {
                             throw new ForflexTypeMismatchError(this.formula, token, ForflexFunction.class, ForflexAlgebra.class);
                         }
 
-                        ForflexFunction function = this.functions.get(token.value());
+                        ForflexFunction<?> function = this.functions.get(token.value());
                         return new ForflexFunctionCallNode(function, this.parseParameterList());
                     }
 
@@ -164,25 +169,20 @@ public class ForflexParser {
             return null;
         }
 
-        private List<Object> parseParameterList() throws ForflexUnexpectedTokenError, ForflexTypeMismatchError, ForflexUndeclaredIdentifierError {
+        private List<ForflexEvaluable> parseParameterList() throws ForflexUnexpectedTokenError, ForflexTypeMismatchError, ForflexUndeclaredIdentifierError {
             this.expect(ForflexTokenType.LPAREN);
-            List<Object> params = new ArrayList<>();
-            ForflexToken next = null;
+            List<ForflexEvaluable> params = new ArrayList<>();
 
+            ForflexToken next;
             do {
-                if (ForflexTokenType.STRING == this.peekToken(ForflexTokenType.STRING)) {
-                    params.add(Objects.requireNonNull(this.nextTokenOfType(ForflexTokenType.STRING)).value());
-                } else if (ForflexTokenType.RPAREN != this.peekToken(ForflexTokenType.RPAREN)) {
-                    params.add(this.parseExpression());
-                }
-
+                params.add(this.parseExpression());
                 next = this.expect(ForflexTokenType.COMMA, ForflexTokenType.RPAREN);
             } while (ForflexTokenType.COMMA == next.type());
 
             return params;
         }
 
-        private ForflexTokenType peekToken(ForflexTokenType... types) {
+        private ForflexTokenType peekTokenType() {
             return this.tokens.get(this.index).type();
         }
 
