@@ -1,5 +1,6 @@
 package alessandrosalerno.forflex.nodes;
 
+import alessandrosalerno.forflex.ForflexParameterAssignment;
 import alessandrosalerno.forflex.algebra.ForflexAlgebra;
 
 public class ForflexIdentityNode implements ForflexEvaluable {
@@ -10,7 +11,7 @@ public class ForflexIdentityNode implements ForflexEvaluable {
     }
 
     @Override
-    public ForflexAlgebra<?> evaluate() {
+    public ForflexAlgebra<?> evaluate(ForflexParameterAssignment params) {
         return this.algebra;
     }
 }

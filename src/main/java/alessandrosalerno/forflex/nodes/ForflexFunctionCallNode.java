@@ -1,28 +1,28 @@
 package alessandrosalerno.forflex.nodes;
 
 import alessandrosalerno.forflex.ForflexFunction;
+import alessandrosalerno.forflex.ForflexParameterAssignment;
 import alessandrosalerno.forflex.algebra.ForflexAlgebra;
-import alessandrosalerno.forflex.algebra.ForflexAlgebraOperation;
 
 import java.util.List;
 
 public class ForflexFunctionCallNode implements ForflexEvaluable {
     private final ForflexFunction<?> function;
-    private final List<ForflexEvaluable> params;
+    private final List<ForflexEvaluable> arguments;
 
-    public ForflexFunctionCallNode(ForflexFunction<?> function, List<ForflexEvaluable> params) {
+    public ForflexFunctionCallNode(ForflexFunction<?> function, List<ForflexEvaluable> arguments) {
         this.function = function;
-        this.params = params;
+        this.arguments = arguments;
     }
 
     @Override
-    public ForflexAlgebra<?> evaluate() {
-        ForflexAlgebra<?>[] paramResults = new ForflexAlgebra<?>[this.params.size()];
+    public ForflexAlgebra<?> evaluate(ForflexParameterAssignment params) {
+        ForflexAlgebra<?>[] argResults = new ForflexAlgebra<?>[this.arguments.size()];
 
-        for (int i = 0; i < this.params.size(); i++) {
-            paramResults[i] = this.params.get(i).evaluate();
+        for (int i = 0; i < this.arguments.size(); i++) {
+            argResults[i] = this.arguments.get(i).evaluate(params);
         }
 
-        return this.function.run(paramResults);
+        return this.function.run(argResults);
     }
 }

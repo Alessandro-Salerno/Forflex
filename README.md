@@ -105,8 +105,9 @@ import alessandrosalerno.forflex.ForflexFunction;
 import alessandrosalerno.forflex.ForflexParser;
 import alessandrosalerno.forflex.ForflexUtils;
 import alessandrosalerno.forflex.errors.preprocessor.ForflexPreprocessorError;
+import alessandrosalerno.forflex.errors.runtime.ForflexArgumentCountError;
 import alessandrosalerno.forflex.errors.runtime.ForflexParameterCountError;
-import alessandrosalerno.forflex.errors.runtime.ForflexParameterTypeError;
+import alessandrosalerno.forflex.errors.runtime.ForflexArgumentTypeError;
 import alessandrosalerno.forflex.algebra.ForflexAlgebra;
 import alessandrosalerno.forflex.algebra.ForflexRealNumber;
 
@@ -125,15 +126,15 @@ public class Main {
             parameters.put("d", new ForflexRealNumber(4));
 
             ForflexParser parser = new ForflexParser().addFunctions(ForflexUtils.DEFAULT_FUNCTIONS)
-                                                        .addFunction("priceof", new ForflexFunction<ForflexRealNumber>() {
-                @Override
-                public ForflexRealNumber run(ForflexAlgebra<?>[] params) {
-                    String symbol = ForflexUtils.requireParameterPrimitiveType(params, 0, String.class);
-                    String date = ForflexUtils.requireParameterPrimitiveType(params, 1, String.class);
-                    // Do some magic stock market stuff
-                    return new ForflexRealNumber(200.5);
-                }
-            });
+                    .addFunction("priceof", new ForflexFunction<ForflexRealNumber>() {
+                        @Override
+                        public ForflexRealNumber run(ForflexAlgebra<?>[] params) {
+                            String symbol = ForflexUtils.requireArgumentPrimitiveType(params, 0, String.class);
+                            String date = ForflexUtils.requireArgumentPrimitiveType(params, 1, String.class);
+                            // Do some magic stock market stuff
+                            return new ForflexRealNumber(200.5);
+                        }
+                    });
 
             ForflexExpression expr = parser.parse(formula, parameters);
             // Now the expression has been parsed, parameters can be changed at any time
@@ -142,8 +143,8 @@ public class Main {
             System.out.println(result.getPrimitive());
         } catch (ForflexPreprocessorError e) {
             e.printErrorMessage();
-        } catch (ForflexParameterCountError
-                 | ForflexParameterTypeError e) {
+        } catch (ForflexArgumentCountError
+                 | ForflexArgumentTypeError e) {
             e.printStackTrace();
         }
     }

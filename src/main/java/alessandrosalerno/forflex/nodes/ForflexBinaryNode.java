@@ -1,5 +1,6 @@
 package alessandrosalerno.forflex.nodes;
 
+import alessandrosalerno.forflex.ForflexParameterAssignment;
 import alessandrosalerno.forflex.algebra.ForflexAlgebra;
 import alessandrosalerno.forflex.algebra.ForflexAlgebraOperation;
 
@@ -21,12 +22,12 @@ public class ForflexBinaryNode implements ForflexEvaluable {
     }
 
     @Override
-    public ForflexAlgebra evaluate() {
+    public ForflexAlgebra evaluate(ForflexParameterAssignment params) {
         return switch (this.operation) {
-            case ADDITION -> this.left.evaluate().add(this.right.evaluate());
-            case SUBTRACTION -> this.left.evaluate().subtract(this.right.evaluate());
-            case MULTIPLICATION -> this.left.evaluate().multiply(this.right.evaluate());
-            case DIVISION -> this.left.evaluate().divide(this.right.evaluate());
+            case ADDITION -> this.left.evaluate(params).add(this.right.evaluate(params));
+            case SUBTRACTION -> this.left.evaluate(params).subtract(this.right.evaluate(params));
+            case MULTIPLICATION -> this.left.evaluate(params).multiply(this.right.evaluate(params));
+            case DIVISION -> this.left.evaluate(params).divide(this.right.evaluate(params));
         };
     }
 }
