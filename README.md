@@ -153,22 +153,16 @@ public class Main {
 ```
 
 ## Installing Forflex with Maven
-After downloading the JAR and placing it in some project directory (e.g., resources), use the following dependency structure in your pom.xml file:
+You can install Forflex using the official [GitHub Package](https://github.com/Alessandro-Salerno/Forflex/packages/2419537).
+
+Alternatively, you can download and install it manually. After downloading the JAR and placing it in some project directory (e.g., resources), use the following dependency structure in your pom.xml file:
 ```xml
 <dependency>
     <groupId>alessandrosalerno.forflex</groupId>
     <artifactId>forflex</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <scope>system</scope>
-    <systemPath>${project.basedir}/src/main/resources/forflex-1.0.1.jar</systemPath>
-</dependency>
-```
-Alternatively, you can install the package from GitHub Packages:
-```xml
-<dependency>
-    <groupId>alessandrosalerno.forflex</groupId>
-    <artifactId>forflex</artifactId>
-    <version>1.0.1</version>
+    <systemPath>${project.basedir}/src/main/resources/forflex-1.0.2.jar</systemPath>
 </dependency>
 ```
 
