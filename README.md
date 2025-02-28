@@ -100,7 +100,10 @@ The Parser (`ForflexParser`) is the component responsible for constructing the t
 ## Example
 
 ```java
-import alessandrosalerno.forflex.algebra.ForflexString;
+import alessandrosalerno.forflex.ForflexExpression;
+import alessandrosalerno.forflex.ForflexFunction;
+import alessandrosalerno.forflex.ForflexParser;
+import alessandrosalerno.forflex.ForflexUtils;
 import alessandrosalerno.forflex.errors.preprocessor.ForflexPreprocessorError;
 import alessandrosalerno.forflex.errors.runtime.ForflexParameterCountError;
 import alessandrosalerno.forflex.errors.runtime.ForflexParameterTypeError;
