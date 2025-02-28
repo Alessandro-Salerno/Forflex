@@ -27,8 +27,8 @@
 
 ## Features
 - Java function invocation inside expressions
-- Strings in function parameters (used to retreive data from the host program)
 - Expression parameters
+- Real and string algebras included
 - Custom algebric structures other than real numbers
 - Parse tree caching
 - Error handling
@@ -48,11 +48,10 @@ Grammar:
     <string>     := "{<symbol>}*"
     <identifier> := <letter>|_{<letter>|<digit>|_}*
     <expr>       := <term>[{+|-}<term>]
-    <param>      := <expr>|<string>
-    <params>     := [<param>{, <param>}*]
+    <params>     := [<expr>{, <expr>}*]
     <call>       := <identifier>(<params>)
     <term>       := <factor>[{*|/}<factor>]
-    <factor>     := -<factor>|(<expr>)|<number>|<identifier>|<call>
+    <factor>     := -<factor>|(<expr>)|<number>|<identifier>|<call>|<string>
 ```
 
 For example, this is a valid statement:
