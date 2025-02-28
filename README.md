@@ -100,16 +100,13 @@ The Parser (`ForflexParser`) is the component responsible for constructing the t
 ## Example
 
 ```java
-import alessandrosalerno.forflex.ForflexExpression;
-import alessandrosalerno.forflex.ForflexFunction;
-import alessandrosalerno.forflex.ForflexParser;
-import alessandrosalerno.forflex.ForflexUtils;
+import alessandrosalerno.forflex.*;
 import alessandrosalerno.forflex.errors.preprocessor.ForflexPreprocessorError;
-import alessandrosalerno.forflex.errors.runtime.ForflexArgumentCountError;
-import alessandrosalerno.forflex.errors.runtime.ForflexParameterCountError;
-import alessandrosalerno.forflex.errors.runtime.ForflexArgumentTypeError;
 import alessandrosalerno.forflex.algebra.ForflexAlgebra;
 import alessandrosalerno.forflex.algebra.ForflexRealNumber;
+import alessandrosalerno.forflex.errors.runtime.ForflexArgumentCountError;
+import alessandrosalerno.forflex.errors.runtime.ForflexArgumentTypeError;
+import alessandrosalerno.forflex.errors.runtime.ForflexUnassignedParametersError;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -118,33 +115,37 @@ public class Main {
     public static void main(String[] args) {
         try {
             String formula = "round((a + b + c - d) / (5.47 * sin(1)) + priceof(\"AAPL\", \"2025-02-26\"))";
-            Map<String, ForflexAlgebra<?>> parameters = new HashMap<>();
+            ForflexParameterSpec parameterSpec = new ForflexParameterSpec()
+                                                        .addParam("a")
+                                                        .addParam("b")
+                                                        .addParam("c")
+                                                        .addParam("d");
 
-            parameters.put("a", new ForflexRealNumber(1));
-            parameters.put("b", new ForflexRealNumber(2));
-            parameters.put("c", new ForflexRealNumber(3));
-            parameters.put("d", new ForflexRealNumber(4));
+            ForflexParser parser = new ForflexParser()
+                                            .addFunctions(ForflexUtils.DEFAULT_FUNCTIONS)
+                                            .addFunction("priceof", new ForflexFunction<ForflexRealNumber>() {
+                @Override
+                public ForflexRealNumber run(ForflexAlgebra<?>[] args) {
+                    String symbol = ForflexUtils.requireArgumentPrimitiveType(args, 0, String.class);
+                    String date = ForflexUtils.requireArgumentPrimitiveType(args, 1, String.class);
+                    // Do some magic stock market stuff
+                    return new ForflexRealNumber(200.5);
+                }
+            });
 
-            ForflexParser parser = new ForflexParser().addFunctions(ForflexUtils.DEFAULT_FUNCTIONS)
-                    .addFunction("priceof", new ForflexFunction<ForflexRealNumber>() {
-                        @Override
-                        public ForflexRealNumber run(ForflexAlgebra<?>[] params) {
-                            String symbol = ForflexUtils.requireArgumentPrimitiveType(params, 0, String.class);
-                            String date = ForflexUtils.requireArgumentPrimitiveType(params, 1, String.class);
-                            // Do some magic stock market stuff
-                            return new ForflexRealNumber(200.5);
-                        }
-                    });
-
-            ForflexExpression expr = parser.parse(formula, parameters);
-            // Now the expression has been parsed, parameters can be changed at any time
-            // NOTE: this means that parameters are NOT thread-safe!
-            ForflexRealNumber result = (ForflexRealNumber) expr.evaluate();
+            ForflexExpression expr = parser.parse(formula, parameterSpec);
+            ForflexParameterAssignment parameterAssignment = new ForflexParameterAssignment(parameterSpec)
+                                                                    .assign("a", new ForflexRealNumber(1))
+                                                                    .assign("b", new ForflexRealNumber(2))
+                                                                    .assign("c", new ForflexRealNumber(3))
+                                                                    .assign("d", new ForflexRealNumber(4));
+            ForflexRealNumber result = (ForflexRealNumber) expr.evaluate(parameterAssignment);
             System.out.println(result.getPrimitive());
         } catch (ForflexPreprocessorError e) {
             e.printErrorMessage();
         } catch (ForflexArgumentCountError
-                 | ForflexArgumentTypeError e) {
+                 | ForflexArgumentTypeError
+                 | ForflexUnassignedParametersError e) {
             e.printStackTrace();
         }
     }
