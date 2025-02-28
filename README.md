@@ -156,9 +156,9 @@ After downloading the JAR and placing it in some project directory (e.g., resour
 <dependency>
     <groupId>alessandrosalerno.forflex</groupId>
     <artifactId>forflex</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <scope>system</scope>
-    <systemPath>${project.basedir}/src/main/resources/forflex-1.0.0.jar</systemPath>
+    <systemPath>${project.basedir}/src/main/resources/forflex-1.0.1.jar</systemPath>
 </dependency>
 ```
 Alternatively, you can install the package from GitHub Packages:
@@ -166,7 +166,7 @@ Alternatively, you can install the package from GitHub Packages:
 <dependency>
     <groupId>alessandrosalerno.forflex</groupId>
     <artifactId>forflex</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
