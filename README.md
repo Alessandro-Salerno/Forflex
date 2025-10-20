@@ -86,7 +86,7 @@ Forflex ships with four main evaluables:
 - Parameter (`ForflexParameterNode` - used to store references to parameters)
 
 ### Expressions
-Expressions in Forflex are a special type of evaluable which stands outside the tree and is used to cahce the tree itself in order to reuse it. This removes the need to reparse the expression every time it has to be evaluated with a given set of parameters.
+Expressions in Forflex are a special type of evaluable which stands outside the tree and is used to cache the tree itself in order to reuse it. This removes the need to reparse the expression every time it has to be evaluated with a given set of parameters.
 
 ### Functions
 Functions in Forflex are implementations of the `ForflexFunction` interface which, once added to a Parser, can be invoked from within an expression.
